@@ -68,13 +68,71 @@ dhis2_clean |>
 ## You can use the across function in the summarise function
   
 
+## 23 - 10- 2024###
+## The across function###
+
+dhis2_clean |> 
+  filter(period == "202401") |> 
+  group_by(region) |> 
+  summarise( DPT1 = sum( DPT1), 
+             DPT3 = sum( DPT3),
+             YF = sum( YF, na.rm = T)) |> 
+  arrange(desc(DPT1))
+
+## using across
+
+dhis2_clean |> 
+  filter(period == "202401") |> 
+  group_by(region) |> 
+  summarise( across(c(DPT1, DPT3, MR1,MR2, YF), sum ) ) |> 
+  arrange(desc(DPT1))
+
+dhis2_clean |> 
+  filter(period == "202401") |> 
+  group_by(region) |> 
+  summarise( across(DPT1:HPV1, sum ) ) |> 
+  arrange(desc(DPT1))
+
+dhis2_clean |> 
+  filter(period == "202401") |> 
+  group_by(region) |> 
+  summarise(across(where(is.numeric), sum )) |> 
+  arrange(desc(DPT1))
+
+### Handling expections in across ###
+
+dhis2_clean |> 
+  filter(period == "202401") |> 
+  mutate(period = as.character(period)) |> 
+  group_by(region) |> 
+  summarise(across(where(is.numeric), sum )) |> 
+  arrange(desc(DPT1))
+
+
+dhis2_clean |> 
+  filter(period == "202401") |> 
+  mutate(period = as.character(period)) |> 
+  group_by(region) |> 
+  summarise(across(!c(where(is.numeric)), count )) |> 
+  arrange(desc(DPT1))
+
+
+#### stringr package #####
+
+stringr::str_c("Robinson", "Amanyiraho", sep = ",")
+
+dhis2_clean |> 
+  mutate(region = str_to_upper(region),
+         district = str_remove(string = district, pattern = " District" ),
+         district = str_remove(string = district, pattern = " City" ),
+         district = str_to_lower(district)) |> 
+  #filter(str_detect(district, "a")) |> View()
+#filter(str_detect(district, "^bu")) |> View()
+filter(str_detect(district, "*a")) |> View()
 
 
 
 
-
-
-
-
+### Change the period column from "202401" to "2024-01-01"
 
 
